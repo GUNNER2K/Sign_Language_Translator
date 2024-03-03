@@ -48,7 +48,7 @@ def hand_capture(img):
         hand = hands[0]
         x,y,w,h = hand['bbox']
         imgcrop = img[y-safezone:y+h+safezone, x-safezone:x+w+safezone]
-        return imgcrop , True
+        return tf.image.resize(imgcrop, (200, 200)) , True
     else:
         return img , False
     
@@ -67,13 +67,14 @@ cap = cv2.VideoCapture(0)
         
 while cap.isOpened():
     ret, frame = cap.read()
+    # print(frame)
 
     new_img , ishand = hand_capture(frame)
     if ishand:
-        print(new_img)
-        img = tf.image.resize(new_img , (200 , 200))
-        img = tf.keras.preprocessing.image.img_to_array(img)
-        img = np.expand_dims(img, axis=0)
+        # print(new_img)
+        # img = tf.image.resize(new_img , (200 , 200))
+        # img = tf.keras.preprocessing.image.img_to_array(img)
+        img = np.expand_dims(new_img, axis=0)
         prediction = model.predict(img)
         prediction = np.argmax(prediction,axis=1)
         letter = categories[prediction[0]]

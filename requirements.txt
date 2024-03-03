@@ -1,0 +1,10 @@
+streamlit
+tensorflow
+pandas
+numpy
+matplotlib
+seaborn
+opencv-python
+split-folders
+cvzone
+mediapipe

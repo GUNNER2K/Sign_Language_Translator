@@ -4,6 +4,9 @@ from cvzone.HandTrackingModule import HandDetector
 from tensorflow.keras.models import load_model
 import tensorflow as tf
 import time
+import memory_profiler
+
+tf.config.experimental.set_memory_growth(device= 'CPU', enable= True)
 
 categories = {  0: "0",
                 1: "1",
@@ -43,12 +46,14 @@ categories = {  0: "0",
                 35: "z",
             }
 
+@memory_profiler.profile
 def hand_capture(img):
     detector = HandDetector(maxHands=1)
     safezone = 120
     hands, img2 = detector.findHands(img)
     if hands:
         hand = hands[0]
+        del hands, img2
         x,y,w,h = hand['bbox']
         imgcrop = img[y-safezone:y+h+safezone, x-safezone:x+w+safezone]
         # print(imgcrop.shape)
@@ -56,6 +61,7 @@ def hand_capture(img):
             return cv2.resize(imgcrop, (200, 200)), True, (x, y, w, h)
     return img, False, ()
 
+@memory_profiler.profile
 def draw_info_text(image, boundaries, letter):
     cv2.rectangle(image, (boundaries[0], boundaries[1]), (boundaries[0] + boundaries[2], boundaries[1] + boundaries[3]), (0, 0, 0), 1)
 
@@ -67,13 +73,14 @@ def draw_info_text(image, boundaries, letter):
     return image
 
 
-
+@memory_profiler.profile
 def load_model():
     model = tf.keras.saving.load_model(
         'Models/asl_model_1.h5', custom_objects=None, compile=False, safe_mode=True
     )
     return model
 
+@memory_profiler.profile
 def model_predict(img):
     # Preprocess img with TensorFlow functions outside the loop
     # img = tf.image.resize(img, (200, 200))
@@ -82,12 +89,13 @@ def model_predict(img):
     prediction = model.predict(img)
     prediction = np.argmax(prediction, axis=1)
     letter = categories[prediction[0]]
+    del prediction, img
     return letter
 
 model = load_model()    
 
-cap = cv2.VideoCapture(0)
-count = 0        
+cap = cv2.VideoCapture(0)    
+count = 0
 while cap.isOpened():
     count += 1
     ret, frame = cap.read()
@@ -106,5 +114,9 @@ while cap.isOpened():
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+    if count == 3:
+        break
+
+del model
 cap.release()
 cv2.destroyAllWindows()

@@ -55,6 +55,16 @@ def hand_capture(img):
             return cv2.resize(imgcrop, (200, 200)), True
     return img, False
 
+def draw_info_text(image, boundaries, letter):
+    cv2.rectangle(image, (boundaries[0], boundaries[1], (boundaries[0] + boundaries[2], boundaries[1] + boundaries[3]), (0, 0, 0), -1))
+
+    letter_text = letter
+
+    cv2.putText(image, letter_text, (boundaries[0] + 5, boundaries[1] - 4),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
+    
+    return image
+
 
 
 def load_model():
@@ -84,7 +94,7 @@ while cap.isOpened():
     new_img , ishand = hand_capture(frame)
     if ishand:
         letter = model_predict(new_img)
-        print(letter)
+        draw_info_text(image= frame, letter= letter, )
     else :
         print("  ")
     cv2.imshow('frame' , frame)

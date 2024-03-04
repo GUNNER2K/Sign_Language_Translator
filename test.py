@@ -3,6 +3,7 @@ import numpy as np
 from cvzone.HandTrackingModule import HandDetector
 from tensorflow.keras.models import load_model
 import tensorflow as tf
+import time
 
 categories = {  0: "0",
                 1: "1",
@@ -50,7 +51,7 @@ def hand_capture(img):
         hand = hands[0]
         x,y,w,h = hand['bbox']
         imgcrop = img[y-safezone:y+h+safezone, x-safezone:x+w+safezone]
-        print(imgcrop.shape)
+        # print(imgcrop.shape)
         if imgcrop.shape[0] != 0 and imgcrop.shape[1] != 0:
             return cv2.resize(imgcrop, (200, 200)), True, (x, y, w, h)
     return img, False, ()
@@ -61,7 +62,7 @@ def draw_info_text(image, boundaries, letter):
     letter_text = letter
 
     cv2.putText(image, letter_text, (boundaries[0] + 5, boundaries[1] - 4),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 4, cv2.LINE_AA)
     
     return image
 
@@ -94,6 +95,7 @@ while cap.isOpened():
     new_img , ishand, boundaries = hand_capture(frame)
     if ishand:
         letter = model_predict(new_img)
+        time.sleep(0.12)
         draw_info_text(image= frame, 
                        boundaries= boundaries, 
                        letter= letter)

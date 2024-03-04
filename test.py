@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 from cvzone.HandTrackingModule import HandDetector
+from tensorflow.keras.models import load_model
+import tensorflow as tf
 
 categories = {  0: "0",
                 1: "1",
@@ -48,12 +50,11 @@ def hand_capture(img):
         hand = hands[0]
         x,y,w,h = hand['bbox']
         imgcrop = img[y-safezone:y+h+safezone, x-safezone:x+w+safezone]
-        return tf.image.resize(imgcrop, (200, 200)) , True
-    else:
-        return img , False
-    
-from tensorflow.keras.models import load_model
-import tensorflow as tf
+        # print(imgcrop.shape)
+        if imgcrop.shape:
+            return cv2.resize(imgcrop, (200, 200)), True
+    return img, False
+
 
 
 def load_model():
@@ -61,31 +62,35 @@ def load_model():
         'Models/asl_model_1.h5', custom_objects=None, compile=False, safe_mode=True
     )
     return model
+
+def model_predict(img):
+    # Preprocess img with TensorFlow functions outside the loop
+    # img = tf.image.resize(img, (200, 200))
+    # img = tf.keras.preprocessing.image.img_to_array(img)
+    img = np.expand_dims(img, axis=0)
+    prediction = model.predict(img)
+    prediction = np.argmax(prediction, axis=1)
+    letter = categories[prediction[0]]
+    return letter
+
 model = load_model()    
 
 cap = cv2.VideoCapture(0)
-        
+count = 0        
 while cap.isOpened():
+    count += 1
     ret, frame = cap.read()
-    # print(frame)
 
     new_img , ishand = hand_capture(frame)
     if ishand:
-        # print(new_img)
-        # img = tf.image.resize(new_img , (200 , 200))
-        # img = tf.keras.preprocessing.image.img_to_array(img)
-        img = np.expand_dims(new_img, axis=0)
-        prediction = model.predict(img)
-        prediction = np.argmax(prediction,axis=1)
-        letter = categories[prediction[0]]
+        letter = model_predict(new_img)
         print(letter)
-        # prediction = model.predict(crop_img)
-        ishand = False
     else :
         print("  ")
     cv2.imshow('frame' , frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
 cap.release()
 cv2.destroyAllWindows()

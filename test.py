@@ -50,13 +50,13 @@ def hand_capture(img):
         hand = hands[0]
         x,y,w,h = hand['bbox']
         imgcrop = img[y-safezone:y+h+safezone, x-safezone:x+w+safezone]
-        # print(imgcrop.shape)
-        if imgcrop.shape:
-            return cv2.resize(imgcrop, (200, 200)), True
-    return img, False
+        print(imgcrop.shape)
+        if imgcrop.shape[0] != 0 and imgcrop.shape[1] != 0:
+            return cv2.resize(imgcrop, (200, 200)), True, (x, y, w, h)
+    return img, False, ()
 
 def draw_info_text(image, boundaries, letter):
-    cv2.rectangle(image, (boundaries[0], boundaries[1], (boundaries[0] + boundaries[2], boundaries[1] + boundaries[3]), (0, 0, 0), -1))
+    cv2.rectangle(image, (boundaries[0], boundaries[1]), (boundaries[0] + boundaries[2], boundaries[1] + boundaries[3]), (0, 0, 0), 1)
 
     letter_text = letter
 
@@ -91,10 +91,12 @@ while cap.isOpened():
     count += 1
     ret, frame = cap.read()
 
-    new_img , ishand = hand_capture(frame)
+    new_img , ishand, boundaries = hand_capture(frame)
     if ishand:
         letter = model_predict(new_img)
-        draw_info_text(image= frame, letter= letter, )
+        draw_info_text(image= frame, 
+                       boundaries= boundaries, 
+                       letter= letter)
     else :
         print("  ")
     cv2.imshow('frame' , frame)

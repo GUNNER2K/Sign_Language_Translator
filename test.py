@@ -95,7 +95,7 @@ while cap.isOpened():
     new_img , ishand, boundaries = hand_capture(frame)
     if ishand:
         letter = model_predict(new_img)
-        time.sleep(0.12)
+        time.sleep(0.02)
         draw_info_text(image= frame, 
                        boundaries= boundaries, 
                        letter= letter)

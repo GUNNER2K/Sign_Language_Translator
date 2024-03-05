@@ -6,7 +6,7 @@ import tensorflow as tf
 import time
 import memory_profiler
 
-tf.config.experimental.set_memory_growth(device= 'CPU', enable= True)
+# tf.config.experimental.set_memory_growth(device= 'CPU', enable= True)
 
 categories = {  0: "0",
                 1: "1",
@@ -50,12 +50,14 @@ categories = {  0: "0",
 def hand_capture(img):
     detector = HandDetector(maxHands=1)
     safezone = 120
-    hands, img2 = detector.findHands(img)
+    hands, img2 = detector.findHands(img, draw= False)
+    detector, img2 = None, None
     if hands:
         hand = hands[0]
-        del hands, img2
+        hands = None
         x,y,w,h = hand['bbox']
         imgcrop = img[y-safezone:y+h+safezone, x-safezone:x+w+safezone]
+        img = None
         # print(imgcrop.shape)
         if imgcrop.shape[0] != 0 and imgcrop.shape[1] != 0:
             return cv2.resize(imgcrop, (200, 200)), True, (x, y, w, h)
@@ -89,7 +91,7 @@ def model_predict(img):
     prediction = model.predict(img)
     prediction = np.argmax(prediction, axis=1)
     letter = categories[prediction[0]]
-    del prediction, img
+    prediction, img = None, None
     return letter
 
 model = load_model()    
@@ -99,6 +101,7 @@ count = 0
 while cap.isOpened():
     count += 1
     ret, frame = cap.read()
+    cap.set()
 
     new_img , ishand, boundaries = hand_capture(frame)
     if ishand:
@@ -107,15 +110,18 @@ while cap.isOpened():
         draw_info_text(image= frame, 
                        boundaries= boundaries, 
                        letter= letter)
+        letter, new_img = None, None # Deallocating memory
     else :
         print("  ")
     cv2.imshow('frame' , frame)
 
+    frame = None # Deallocating memory
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    if count == 3:
-        break
+    # if count == 3:
+    #     break
 
 del model
 cap.release()

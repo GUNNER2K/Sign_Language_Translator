@@ -101,7 +101,6 @@ count = 0
 while cap.isOpened():
     count += 1
     ret, frame = cap.read()
-    cap.set()
 
     new_img , ishand, boundaries = hand_capture(frame)
     if ishand:

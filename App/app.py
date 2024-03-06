@@ -66,8 +66,6 @@ with tab4:
             frame_placeholder = st.empty()
             word = ''
             translator(frame_placeholder, st)
-        elif st.button('Stop Translate'):
-            st.empty()
     with col2:
         st.write(word)    
         

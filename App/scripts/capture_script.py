@@ -109,7 +109,7 @@ def translator(frame_placeholder, st):
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         frame_placeholder.image(frame, channels='BGR')
         #st.write(prediction)
-        if cv2.waitKey(10) & 0xFF == ord('q'):
-            break
+        if st.button('Stop Translate'):
+            st.empty()
     cap.release()
     cv2.destroyAllWindows()

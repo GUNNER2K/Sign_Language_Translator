@@ -95,7 +95,7 @@ while True:
     #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     img = frame
     frame, coord = draw_hands(frame)
-    if frame_counter == 60:
+    if frame_counter == 61:
         if coord:
 
             frame , letter= draw_prediction(img, coord)

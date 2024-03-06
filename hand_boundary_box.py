@@ -95,14 +95,16 @@ while True:
     #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     img = frame
     frame, coord = draw_hands(frame)
-    if frame_counter == 60:
+    if frame_counter == 61:
         if coord:
 
             frame , letter= draw_prediction(img, coord)
-            print(letter)
+            word = word+ letter
             frame_counter = 0
         else:
             frame_counter = 0
+            print(word)
+            word = ''
     #frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
     cv2.imshow('Hand Boundary Box', frame)
     if cv2.waitKey(10) & 0xFF == ord('q'):

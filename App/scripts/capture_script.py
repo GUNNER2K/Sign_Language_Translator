@@ -9,4 +9,7 @@ def hand_capture(img):
         hand = hands[0]
         x,y,w,h = hand['bbox']
         imgcrop = img[y-safezone:y+h+safezone, x-safezone:x+w+safezone]
-        return imgcrop, img
+        return imgcrop, img, True
+    
+    else:
+        return None, img, False

@@ -57,19 +57,20 @@ with tab4:
             while cap.isOpened() and not stop:
                 ret, image = cap.read()
             
-                new_img, image = hand_capture(image)
-                img = image.img_to_array(new_img)
-                img = np.expand_dims(img, axis=0)
-                prediction = model.predict(img)
-                prediction = np.argmax(prediction,axis=1)
-                print(prediction)
+                new_img, image, ishand = hand_capture(image)
+                # img = image.img_to_array(new_img)
+                if ishand:
+                    new_img = tf.expand_dims(cv2.resize(new_img, (200, 200)), axis= 0)
+                    prediction = model.predict(new_img)
+                    prediction = np.argmax(prediction,axis=1)
+                    print(prediction)
                 #prediction = model.predict(crop_img)
                 if not ret:
                     st.write('Video Capture has ended.')
                     break
                 frame_placeholder.image(image, channels='BGR')
                 #st.write(prediction)
-                if cv2.waitKey(1) & 0xFF == ord('q') or stop:
+                if cv2.waitKey(10) & 0xFF == ord('q') or stop:
                     break
             cap.release()
             cv2.destroyAllWindows()

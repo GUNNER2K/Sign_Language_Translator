@@ -10,10 +10,10 @@ from scripts.capture_script import *
 from tensorflow.keras.models import load_model
 
 
-@st.cache_resource
-def load_model():
-    model = load_model('Models/asl_model_1.h5')
-    return model
+# @st.cache_resource
+# def load_model():
+#     model = load_model('App/assets/asl_model_2.h5')
+#     return model
 
 st.set_page_config(layout='wide')
 
@@ -57,14 +57,15 @@ with tab3:
         st.subheader("Model Architecture")
 
 with tab4:
-    model = load_model()
+    # model = load_model()
 
     col1, col2 = st.columns(2)
     word = ''
     with col1:
         if st.button('Start Translator'):
             frame_placeholder = st.empty()
-            translator(frame_placeholder)
+            word = ''
+            translator(frame_placeholder, st)
         elif st.button('Stop Translate'):
             st.empty()
     with col2:

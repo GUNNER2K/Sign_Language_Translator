@@ -7,7 +7,7 @@ cap = cv2.VideoCapture(0)
 mp_draw = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 detector = mp.solutions.hands.Hands(static_image_mode= False, min_detection_confidence= 0.8, min_tracking_confidence= 0.5, max_num_hands= 2)
-model = tf.keras.models.load_model('Models/asl_model_2.h5')
+model = tf.keras.models.load_model('App/assets/asl_model_2.h5')
 
 categories = {  0: "0",
                 1: "1",
@@ -82,7 +82,7 @@ def draw_prediction(image, coord):
     
     return image , letter
 
-def translator(frame_placeholder):
+def translator(frame_placeholder, st):
     cap = cv2.VideoCapture(0)
     frame_counter = 0
     while cap.isOpened():

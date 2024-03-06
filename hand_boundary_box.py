@@ -59,7 +59,6 @@ def calcBoundaryBox(landmark_list, h, w):
     return round(min(x_coord) * w) - space, round(min(y_coord) * h) - space, round(max(x_coord) * w) + space, round(max(y_coord) * h) + space
 
 def predict_letter(image):
-    image = np.copy(image)
     image = image/255.0
     return categories[tf.argmax(model.predict(tf.expand_dims(cv2.resize(image, (400, 400)), axis= 0))[0]).numpy()]
 

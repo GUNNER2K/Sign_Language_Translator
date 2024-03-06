@@ -12,9 +12,7 @@ from tensorflow.keras.models import load_model
 
 @st.cache_resource
 def load_model():
-    model = tf.keras.saving.load_model(
-        'Models/asl_model_1.h5', custom_objects=None, compile=False, safe_mode=True
-    )
+    model = load_model('Models/asl_model_1.h5')
     return model
 
 st.set_page_config(layout='wide')
@@ -42,38 +40,33 @@ with tab1:
     with col2:
         st.image('App/assets/asl.jpg')
 
+with tab2:
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("Dataset Description")
+
+    with col2:
+        st.subheader("Dataset Sample Images")
+
+with tab3:
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("Model Description")
+
+    with col2:
+        st.subheader("Model Architecture")
 
 with tab4:
     model = load_model()
 
     col1, col2 = st.columns(2)
+    word = ''
     with col1:
-        press = st.button('Start Translator')
-        frame_placeholder = st.empty()
-        stop = st.button('Stop Translate')
-        if press:
-            cap = cv2.VideoCapture(0)
-        
-            while cap.isOpened() and not stop:
-                ret, image = cap.read()
-            
-                new_img, image, ishand = hand_capture(image)
-                # img = image.img_to_array(new_img)
-                if ishand:
-                    new_img = tf.expand_dims(cv2.resize(new_img, (200, 200)), axis= 0)
-                    prediction = model.predict(new_img)
-                    prediction = np.argmax(prediction,axis=1)
-                    print(prediction)
-                #prediction = model.predict(crop_img)
-                if not ret:
-                    st.write('Video Capture has ended.')
-                    break
-                frame_placeholder.image(image, channels='BGR')
-                #st.write(prediction)
-                if cv2.waitKey(10) & 0xFF == ord('q') or stop:
-                    break
-            cap.release()
-            cv2.destroyAllWindows()
-    # with col2:
-    #     st.write(prediction)    
+        if st.button('Start Translator'):
+            frame_placeholder = st.empty()
+            translator(frame_placeholder)
+        elif st.button('Stop Translate'):
+            st.empty()
+    with col2:
+        st.write(word)    
         

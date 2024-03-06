@@ -1,13 +1,13 @@
 import mediapipe as mp
 import cv2
 import tensorflow as tf
-
+import numpy as np
 cap = cv2.VideoCapture(0)
 
 mp_draw = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 detector = mp.solutions.hands.Hands(static_image_mode= False, min_detection_confidence= 0.8, min_tracking_confidence= 0.5, max_num_hands= 2)
-model = tf.keras.models.load_model('Models/asl_model_1.h5')
+model = tf.keras.models.load_model('Models/asl_model_2.h5')
 
 categories = {  0: "0",
                 1: "1",
@@ -58,7 +58,9 @@ def calcBoundaryBox(landmark_list, h, w):
     return round(min(x_coord) * w) - space, round(min(y_coord) * h) - space, round(max(x_coord) * w) + space, round(max(y_coord) * h) + space
 
 def predict_letter(image):
-    return categories[tf.argmax(model.predict(tf.expand_dims(cv2.resize(image, (200, 200)), axis= 0))[0]).numpy()]
+    image = np.copy(image)
+    image = image/255.0
+    return categories[tf.argmax(model.predict(tf.expand_dims(cv2.resize(image, (400, 400)), axis= 0))[0]).numpy()]
 
 
 def draw_hands(imgae):
@@ -70,7 +72,7 @@ def draw_hands(imgae):
         for num, hand in enumerate(hand_landmarks.multi_hand_landmarks):
             mp_draw.draw_landmarks(imgae, hand, mp_hands.HAND_CONNECTIONS)
             xmin, ymin, xmax, ymax = calcBoundaryBox(hand.landmark, height, width)
-            return cv2.rectangle(imgae, (xmin, ymin), (xmax, ymax), (0, 0, 0), 4), (xmin, ymin, xmax, ymax)
+            return cv2.rectangle(imgae, (xmin-50, ymin-50), (xmax+50, ymax+50), (0, 0, 0), 4), (xmin, ymin, xmax, ymax)
             
     else:
         return imgae, None
@@ -79,26 +81,30 @@ def draw_prediction(image, coord):
     letter = predict_letter(image[coord[1] : coord[3], coord[0]:coord[2]])
     cv2.putText(image, letter, (coord[0] + 5, coord[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv2.LINE_AA)
     
-    return image
+    return image , letter
 
 
-
+frame_counter =0
 while True:
+    frame_counter = frame_counter + 1 
+
     ret, frame = cap.read()
 
     frame = cv2.flip(frame, 1)
 
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
+    #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    img = frame
     frame, coord = draw_hands(frame)
+    if frame_counter == 60:
+        if coord:
 
-    if coord:
-        frame = draw_prediction(frame, coord)
-
-    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-
+            frame , letter= draw_prediction(img, coord)
+            print(letter)
+            frame_counter = 0
+        else:
+            frame_counter = 0
+    #frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
     cv2.imshow('Hand Boundary Box', frame)
-
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
 

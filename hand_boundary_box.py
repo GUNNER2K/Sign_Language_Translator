@@ -8,6 +8,7 @@ mp_draw = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 detector = mp.solutions.hands.Hands(static_image_mode= False, min_detection_confidence= 0.8, min_tracking_confidence= 0.5, max_num_hands= 2)
 model = tf.keras.models.load_model('Models/asl_model_2.h5')
+word = ''
 
 categories = {  0: "0",
                 1: "1",
@@ -92,7 +93,7 @@ while True:
 
     frame = cv2.flip(frame, 1)
 
-    #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     img = frame
     frame, coord = draw_hands(frame)
     if frame_counter == 61:
@@ -105,7 +106,7 @@ while True:
             frame_counter = 0
             print(word)
             word = ''
-    #frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
     cv2.imshow('Hand Boundary Box', frame)
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break

@@ -5,6 +5,7 @@ import tensorflow as tf
 cap = cv2.VideoCapture(0)
 
 mp_draw = mp.solutions.drawing_utils
+mp_hands = mp.solutions.hands
 detector = mp.solutions.hands.Hands(static_image_mode= False, min_detection_confidence= 0.8, min_tracking_confidence= 0.5, max_num_hands= 2)
 model = tf.keras.models.load_model('Models/asl_model_1.h5')
 
@@ -67,8 +68,7 @@ def draw_hands(imgae):
 
     if hand_landmarks.multi_hand_landmarks:
         for num, hand in enumerate(hand_landmarks.multi_hand_landmarks):
-            
-            
+            mp_draw.draw_landmarks(imgae, hand, mp_hands.HAND_CONNECTIONS)
             xmin, ymin, xmax, ymax = calcBoundaryBox(hand.landmark, height, width)
             return cv2.rectangle(imgae, (xmin, ymin), (xmax, ymax), (0, 0, 0), 4), (xmin, ymin, xmax, ymax)
             

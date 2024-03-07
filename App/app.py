@@ -61,7 +61,42 @@ with tab4:
     with col1:
         if st.button('Start Translator', key= 'start_button'):
             frame_placeholder = st.empty()
-            translator(frame_placeholder, st)        
+            model = load_model(model_path)
+            #word = ''
+            cap = cv2.VideoCapture(0)
+            frame_counter = 0
+            stop = st.button('Stop', key= 'stop_button')
+            while cap.isOpened():
+                frame_counter += 1
+                ret, frame = cap.read()
+
+                frame = cv2.flip(frame, 1)
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                
+                frame , coord = draw_hands(frame)
+                if frame_counter == 20:
+                    if coord:
+                        letter= draw_prediction(frame, coord, model)
+                        word = word+ letter
+                        frame_counter = 0
+                    else:
+                        frame_counter = 0
+                        st.empty()
+                        st.write(word)
+                        word = ''
+                if not ret:
+                    st.write('Video Capture has ended.')
+                    break
+
+                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                frame_placeholder.image(frame, channels='BGR')
+
+                if stop:
+                    st.empty()
+                    break
+                #st.write(prediction)
+            cap.release()
+            cv2.destroyAllWindows()
     with col2:
         st.write(word)    
         

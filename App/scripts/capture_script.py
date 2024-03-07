@@ -7,7 +7,6 @@ mp_draw = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 detector = mp.solutions.hands.Hands(static_image_mode= False, min_detection_confidence= 0.8, min_tracking_confidence= 0.5, max_num_hands= 2)
 model_path = 'App/assets/asl_model_2.h5'
-coord = None
 
 categories = {  0: "0",
                 1: "1",
@@ -77,50 +76,14 @@ def draw_hands(imgae):
             mp_draw.draw_landmarks(imgae, hand, mp_hands.HAND_CONNECTIONS)
             # xmin, ymin, xmax, ymax = calcBoundaryBox(hand.landmark, height, width)
             coord = calcBoundaryBox(hand.landmark, height, width)
-            return cv2.rectangle(imgae, (coord[0], coord[1]), (coord[2], coord[3]), (0, 0, 0), 4)
+            return cv2.rectangle(imgae, (coord[0], coord[1]), (coord[2], coord[3]), (0, 0, 0), 4) , coord
             
     else:
         coord = None
-        return imgae
+        return imgae , coord
     
-def draw_prediction(image, model):
+def draw_prediction(image, coord ,model):
     letter = predict_letter(image[coord[1] : coord[3], coord[0]:coord[2]], model)
     cv2.putText(image, letter, (coord[0] + 5, coord[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv2.LINE_AA)
     
     return letter
-
-def translator(frame_placeholder, st):
-    model = load_model(model_path)
-    word = ''
-    cap = cv2.VideoCapture(0)
-    frame_counter = 0
-    stop = st.button('Stop', key= 'stop_button')
-    while cap.isOpened():
-        frame_counter += 1
-        ret, frame = cap.read()
-
-        frame = cv2.flip(frame, 1)
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        
-        frame = draw_hands(frame)
-        if frame_counter == 61:
-            if coord:
-                letter= draw_prediction(frame, coord, model)
-                word = word+ letter
-                frame_counter = 0
-            else:
-                frame_counter = 0
-                st.write(word)
-                word = ''
-        if not ret:
-            st.write('Video Capture has ended.')
-            break
-
-        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        frame_placeholder.image(frame, channels='BGR')
-
-        if stop:
-            st.empty()
-        #st.write(prediction)
-    cap.release()
-    cv2.destroyAllWindows()

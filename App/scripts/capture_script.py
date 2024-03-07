@@ -1,13 +1,13 @@
 import mediapipe as mp
 import cv2
 import tensorflow as tf
-import numpy as np
-cap = cv2.VideoCapture(0)
+import streamlit as st
 
 mp_draw = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 detector = mp.solutions.hands.Hands(static_image_mode= False, min_detection_confidence= 0.8, min_tracking_confidence= 0.5, max_num_hands= 2)
-model = tf.keras.models.load_model('App/assets/asl_model_2.h5')
+model_path = 'App/assets/asl_model_2.h5'
+coord = None
 
 categories = {  0: "0",
                 1: "1",
@@ -47,6 +47,11 @@ categories = {  0: "0",
                 35: "z",
             }
 
+@st.cache_resource
+def load_model(model_path):
+    model = tf.keras.models.load_model(model_path)
+    return model
+
 def calcBoundaryBox(landmark_list, h, w):
     space = 25
     x_coord = []
@@ -57,7 +62,7 @@ def calcBoundaryBox(landmark_list, h, w):
 
     return round(min(x_coord) * w) - space, round(min(y_coord) * h) - space, round(max(x_coord) * w) + space, round(max(y_coord) * h) + space
 
-def predict_letter(image):
+def predict_letter(image, model):
     image = image/255.0
     return categories[tf.argmax(model.predict(tf.expand_dims(cv2.resize(image, (400, 400)), axis= 0))[0]).numpy()]
 
@@ -70,21 +75,26 @@ def draw_hands(imgae):
     if hand_landmarks.multi_hand_landmarks:
         for num, hand in enumerate(hand_landmarks.multi_hand_landmarks):
             mp_draw.draw_landmarks(imgae, hand, mp_hands.HAND_CONNECTIONS)
-            xmin, ymin, xmax, ymax = calcBoundaryBox(hand.landmark, height, width)
-            return cv2.rectangle(imgae, (xmin-50, ymin-50), (xmax+50, ymax+50), (0, 0, 0), 4), (xmin, ymin, xmax, ymax)
+            # xmin, ymin, xmax, ymax = calcBoundaryBox(hand.landmark, height, width)
+            coord = calcBoundaryBox(hand.landmark, height, width)
+            return cv2.rectangle(imgae, (coord[0], coord[1]), (coord[2], coord[3]), (0, 0, 0), 4)
             
     else:
-        return imgae, None
+        coord = None
+        return imgae
     
-def draw_prediction(image, coord):
-    letter = predict_letter(image[coord[1] : coord[3], coord[0]:coord[2]])
+def draw_prediction(image, model):
+    letter = predict_letter(image[coord[1] : coord[3], coord[0]:coord[2]], model)
     cv2.putText(image, letter, (coord[0] + 5, coord[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3, cv2.LINE_AA)
     
-    return image , letter
+    return letter
 
 def translator(frame_placeholder, st):
+    model = load_model(model_path)
+    word = ''
     cap = cv2.VideoCapture(0)
     frame_counter = 0
+    stop = st.button('Stop', key= 'stop_button')
     while cap.isOpened():
         frame_counter += 1
         ret, frame = cap.read()
@@ -92,15 +102,15 @@ def translator(frame_placeholder, st):
         frame = cv2.flip(frame, 1)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
-        frame, coord = draw_hands(frame)
+        frame = draw_hands(frame)
         if frame_counter == 61:
             if coord:
-                frame , letter= draw_prediction(frame, coord)
+                letter= draw_prediction(frame, coord, model)
                 word = word+ letter
                 frame_counter = 0
             else:
                 frame_counter = 0
-                print(word)
+                st.write(word)
                 word = ''
         if not ret:
             st.write('Video Capture has ended.')
@@ -108,8 +118,9 @@ def translator(frame_placeholder, st):
 
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         frame_placeholder.image(frame, channels='BGR')
-        #st.write(prediction)
-        if st.button('Stop Translate'):
+
+        if stop:
             st.empty()
+        #st.write(prediction)
     cap.release()
     cv2.destroyAllWindows()

@@ -1,13 +1,9 @@
 import streamlit as st
-import tensorflow as tf
-import pandas as pd
-import numpy as np
-import cv2
-from cvzone.HandTrackingModule import HandDetector
 
 from scripts.capture_script import *
 
 from tensorflow.keras.models import load_model
+
 
 
 # @st.cache_resource
@@ -57,15 +53,15 @@ with tab3:
         st.subheader("Model Architecture")
 
 with tab4:
-    # model = load_model()
+    # model_path = 'App/assets/asl_model_2.h5'
+    # model = load_model(model_path)
 
     col1, col2 = st.columns(2)
     word = ''
     with col1:
-        if st.button('Start Translator'):
+        if st.button('Start Translator', key= 'start_button'):
             frame_placeholder = st.empty()
-            word = ''
-            translator(frame_placeholder, st)
+            translator(frame_placeholder, st)        
     with col2:
         st.write(word)    
         

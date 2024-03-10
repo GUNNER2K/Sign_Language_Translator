@@ -77,7 +77,7 @@ with tab4:
             st.session_state['word'] = 'Krish L Sharma'
         st.button('Start Translator', on_click= init_translation)
         st.button('Stop', on_click= close_translation)
-        print(st.session_state)
+        # print(st.session_state)
         if st.session_state['start_translation']:
             cap = cv2.VideoCapture(0)
             frame_placeholder = st.empty()
@@ -111,9 +111,9 @@ with tab4:
                 frame_placeholder.image(frame, channels='BGR')
                 
                 # print(stop)
-                print(st.session_state)
+                # print(st.session_state)
                 if st.session_state['close_camera']:
-                    print('Stopping the translator')
+                    # print('Stopping the translator')
                     cap.release()
                     cv2.destroyAllWindows()
                     frame_placeholder.empty()

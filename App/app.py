@@ -127,6 +127,7 @@ with tab4:
         st.empty()
 
     with col2:
+        st.subheader('Prediction')
         show_word = st.session_state['word']
         st.empty()
         st.write(show_word)

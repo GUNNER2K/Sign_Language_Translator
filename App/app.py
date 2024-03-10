@@ -12,7 +12,6 @@ from tensorflow.keras.models import load_model
 #     return model
 
 st.set_page_config(layout='wide')
-word = 'Krish L Sharma'
 
 # def update_word():
 #     global word
@@ -68,12 +67,14 @@ with tab4:
     # model = load_model(model_path)
 
     col1, col2 = st.columns(2)
-    # word = ''
+    word = ''
     with col1:
         if 'start_translation' not in st.session_state:
             st.session_state['start_translation'] = False
         if 'close_camera' not in st.session_state:
             st.session_state['close_camera'] = False
+        if 'word' not in st.session_state:
+            st.session_state['word'] = 'Krish L Sharma'
         st.button('Start Translator', on_click= init_translation)
         st.button('Stop', on_click= close_translation)
         print(st.session_state)
@@ -95,13 +96,11 @@ with tab4:
                     if coord:
                         letter= draw_prediction(frame, coord, model)
                         word = word+ letter
+                        st.session_state['word'] += letter
                         frame_counter = 0
                     else:
                         frame_counter = 0
-                        # st.empty()
-                        # with col2:    
-                        #     st.write(word)
-                        # word = ''
+                        st.session_state['word'] += ' '
                 if not ret:
                     st.write('Video Capture has ended.')
                     break
@@ -128,7 +127,8 @@ with tab4:
         st.empty()
 
     with col2:
-        # show_word = update_word()
+        show_word = st.session_state['word']
         st.empty()
-        st.write(word)    
+        st.write(show_word)
+        st.session_state['word'] = ''
         

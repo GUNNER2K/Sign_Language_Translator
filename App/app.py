@@ -25,7 +25,7 @@ def init_translation():
 def close_translation():
     st.session_state['close_camera'] = True
 
-st.header('ASL Trasnlator App')
+st.header('ASL Translator App')
 
 tab1, tab2, tab3, tab4 = st.tabs(['Home', 'Dataset', 'Model', 'Translator'])
 
@@ -50,9 +50,21 @@ with tab2:
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("Dataset Description")
+        st.write('''The Dataset we are using is an image dataset consisting of around 2000 images across 36 different classes ranging from A-Z and 0-9.
+                 
+                 Dataset Link: https://www.kaggle.com/datasets/ayuraj/asl-dataset
+                 
+                 
+This Dataset was preprocessed and Augmented and was used to train our model on.''')
 
     with col2:
         st.subheader("Dataset Sample Images")
+        imga = cv2.imread(r'App\assets\example_ds.png')
+        imga = cv2.cvtColor(imga, cv2.COLOR_BGR2RGB)
+        imgb = cv2.imread(r'App\assets\class_distribution.png')
+        imgb = cv2.cvtColor(imgb, cv2.COLOR_BGR2RGB)
+        st.image(imga)
+        st.image(imgb)
 
 with tab3:
     col1, col2 = st.columns(2)

@@ -12,8 +12,19 @@ from tensorflow.keras.models import load_model
 #     return model
 
 st.set_page_config(layout='wide')
+word = 'Krish L Sharma'
+
+# def update_word():
+#     global word
+#     return word
 
 
+def init_translation():
+    st.session_state['start_translation'] = True
+    st.session_state['close_camera'] = False
+ 
+def close_translation():
+    st.session_state['close_camera'] = True
 
 st.header('ASL Trasnlator App')
 
@@ -57,16 +68,22 @@ with tab4:
     # model = load_model(model_path)
 
     col1, col2 = st.columns(2)
-    word = ''
+    # word = ''
     with col1:
-        if st.button('Start Translator', key= 'start_button'):
+        if 'start_translation' not in st.session_state:
+            st.session_state['start_translation'] = False
+        if 'close_camera' not in st.session_state:
+            st.session_state['close_camera'] = False
+        st.button('Start Translator', on_click= init_translation)
+        st.button('Stop', on_click= close_translation)
+        print(st.session_state)
+        if st.session_state['start_translation']:
+            cap = cv2.VideoCapture(0)
             frame_placeholder = st.empty()
             model = load_model(model_path)
-            #word = ''
-            cap = cv2.VideoCapture(0)
             frame_counter = 0
-            stop = st.button('Stop', key= 'stop_button')
             while cap.isOpened():
+                # stop = st.session_state.stop_button
                 frame_counter += 1
                 ret, frame = cap.read()
 
@@ -81,22 +98,37 @@ with tab4:
                         frame_counter = 0
                     else:
                         frame_counter = 0
-                        st.empty()
-                        st.write(word)
-                        word = ''
+                        # st.empty()
+                        # with col2:    
+                        #     st.write(word)
+                        # word = ''
                 if not ret:
                     st.write('Video Capture has ended.')
                     break
 
                 frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
                 frame_placeholder.image(frame, channels='BGR')
-
-                if stop:
-                    st.empty()
+                
+                # print(stop)
+                print(st.session_state)
+                if st.session_state['close_camera']:
+                    print('Stopping the translator')
+                    cap.release()
+                    cv2.destroyAllWindows()
+                    frame_placeholder.empty()
+                    st.session_state['start_translation'] = False
                     break
                 #st.write(prediction)
-            cap.release()
-            cv2.destroyAllWindows()
+            
+            print('Clearing the column')
+            
+        else:
+            print("This block is running")
+
+        st.empty()
+
     with col2:
+        # show_word = update_word()
+        st.empty()
         st.write(word)    
         

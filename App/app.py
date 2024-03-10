@@ -121,10 +121,7 @@ with tab4:
                     break
                 #st.write(prediction)
             
-            print('Clearing the column')
-            
-        else:
-            print("This block is running")
+            # print('Clearing the column')
 
         st.empty()
 

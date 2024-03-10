@@ -100,7 +100,9 @@ with tab4:
                         frame_counter = 0
                     else:
                         frame_counter = 0
-                        st.session_state['word'] += ' '
+                        if word != '':
+                            st.session_state['word'] += ' '
+                            word = ''
                 if not ret:
                     st.write('Video Capture has ended.')
                     break

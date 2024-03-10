@@ -70,9 +70,18 @@ with tab3:
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("Model Description")
+        st.write('''As we have all image data, the best way to extract meaningful information from the data is using Convolutional Neural Networks(CNN). 
+                 
+The model we created for this application is a 3-Block CNN with each block containing a Convolution Layer, a Maxpooling Layer and a Dropout Layer.
+
+You can see the Model architechture in the following Diagram.''')
 
     with col2:
         st.subheader("Model Architecture")
+        img = cv2.imread(r'App\assets\model.png')
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        st.image(img)
+
 
 with tab4:
     # model_path = 'App/assets/asl_model_2.h5'

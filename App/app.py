@@ -40,7 +40,10 @@ with tab1:
         st.markdown(' - Tensorflow')
         st.markdown(' - Pandas')
         st.markdown(' - Numpy')
+        st.markdown(' - Mediapipe')
+        st.markdown(' - Streamlit')
         st.markdown(' - Matplotlib')
+        
 
     
     with col2:
@@ -56,15 +59,20 @@ with tab2:
                  
                  
 This Dataset was preprocessed and Augmented and was used to train our model on.''')
+        st.text("")
+        st.text("")
+        st.text("")
+        imgb = cv2.imread(r'App\assets\class_distribution.png')
+        imgb = cv2.cvtColor(imgb, cv2.COLOR_BGR2RGB)      
+        st.image(imgb)  
 
     with col2:
         st.subheader("Dataset Sample Images")
         imga = cv2.imread(r'App\assets\example_ds.png')
         imga = cv2.cvtColor(imga, cv2.COLOR_BGR2RGB)
-        imgb = cv2.imread(r'App\assets\class_distribution.png')
-        imgb = cv2.cvtColor(imgb, cv2.COLOR_BGR2RGB)
+        
         st.image(imga)
-        st.image(imgb)
+        
 
 with tab3:
     col1, col2 = st.columns(2)
@@ -113,7 +121,7 @@ with tab4:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 
                 frame , coord = draw_hands(frame)
-                if frame_counter == 20:
+                if frame_counter == 5:
                     if coord:
                         letter= draw_prediction(frame, coord, model)
                         word = word+ letter

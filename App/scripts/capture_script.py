@@ -2,6 +2,7 @@ import mediapipe as mp
 import cv2
 import tensorflow as tf
 import streamlit as st
+import platform
 
 mp_draw = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
@@ -63,7 +64,11 @@ def calcBoundaryBox(landmark_list, h, w):
 
 def predict_letter(image, model):
     image = image/255.0
-    return categories[tf.argmax(model.predict(tf.expand_dims(cv2.resize(image, (400, 400)), axis= 0))[0]).numpy()]
+    if platform.system() == 'Darwin':
+        with tf.device('/device:CPU:0'):
+            return categories[tf.argmax(model.predict(tf.expand_dims(cv2.resize(image, (400, 400)), axis= 0))[0]).numpy()]
+    else:
+        return categories[tf.argmax(model.predict(tf.expand_dims(cv2.resize(image, (400, 400)), axis= 0))[0]).numpy()]
 
 
 def draw_hands(imgae):

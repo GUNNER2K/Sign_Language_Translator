@@ -62,13 +62,13 @@ This Dataset was preprocessed and Augmented and was used to train our model on.'
         st.text("")
         st.text("")
         st.text("")
-        imgb = cv2.imread(r'App\assets\class_distribution.png')
+        imgb = cv2.imread(r'App/assets/class_distribution.png')
         imgb = cv2.cvtColor(imgb, cv2.COLOR_BGR2RGB)      
         st.image(imgb)  
 
     with col2:
         st.subheader("Dataset Sample Images")
-        imga = cv2.imread(r'App\assets\example_ds.png')
+        imga = cv2.imread(r'App/assets/example_ds.png')
         imga = cv2.cvtColor(imga, cv2.COLOR_BGR2RGB)
         
         st.image(imga)
@@ -86,7 +86,7 @@ You can see the Model architechture in the following Diagram.''')
 
     with col2:
         st.subheader("Model Architecture")
-        img = cv2.imread(r'App\assets\model.png')
+        img = cv2.imread(r'App/assets/model.png')
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         st.image(img)
 

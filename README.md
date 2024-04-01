@@ -1,4 +1,4 @@
-# Sign-Language-Translator(Final Year Project for Btech in Computer Science Engineering with specialization in AI and ML)
+# Sign-Language-Translator(Final Year Bachelor's Project )
 
 Sign Language Translator app for the American Sign Language (ASL) standards. **This is the final year Bachelor's project worth 20 CP**. This project aims to convert hand sign language into meaningful letters in real time through camera feed to provide seamless communication. **While the project is almost complete , there are further changes that needs to be made before writing the research paper**
 <br> Project contributors : 
